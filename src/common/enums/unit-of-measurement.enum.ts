@@ -1,0 +1,17 @@
+export enum UnitOfMeasurement {
+  GRAM = 'GRAM',
+  KILOGRAM = 'KILOGRAM',
+  LITRE = 'LITRE',
+  MILLILITRE = 'MILLILITRE',
+  PIECE = 'PIECE',
+  TABLESPOON = 'TABLESPOON',
+  TEASPOON = 'TEASPOON',
+  CUP = 'CUP',
+  PINCH = 'PINCH',
+  TIN = 'TIN',
+  CLOVE = 'CLOVE',
+  CLOTH = 'CLOTH',
+  BOTTLE = 'BOTTLE',
+  CAN = 'CAN',
+  LEAF = 'LEAF',
+}
