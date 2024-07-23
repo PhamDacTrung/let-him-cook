@@ -1,7 +1,10 @@
 import { configurations, DatabaseConfig } from '@config';
+import { AuthModule } from '@modules';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+
+const modules = [AuthModule];
 
 @Module({
   imports: [
@@ -21,6 +24,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
         return config as TypeOrmModuleOptions;
       },
     }),
+    ...modules,
   ],
   controllers: [],
   providers: [],

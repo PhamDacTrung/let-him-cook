@@ -1,6 +1,7 @@
+import AuthConfig from './auth.config';
 import DatabaseConfig from './db.config';
 import LogConfig from './log.config';
 
-const configurations = [DatabaseConfig, LogConfig];
+const configurations = [DatabaseConfig, LogConfig, AuthConfig];
 
-export { DatabaseConfig, LogConfig, configurations };
+export { AuthConfig, DatabaseConfig, LogConfig, configurations };
