@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
+import { IngredientModule } from './modules/ingredient/ingredient.module';
 
 const modules = [AuthModule];
 
@@ -27,6 +28,7 @@ const modules = [AuthModule];
     }),
     ...modules,
     UserModule,
+    IngredientModule,
   ],
   controllers: [],
   providers: [],
