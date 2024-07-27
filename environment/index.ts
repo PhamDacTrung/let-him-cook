@@ -18,3 +18,11 @@ export const POSTGRES_PASSWORD: string =
   process.env.POSTGRES_PASSWORD || 'postgres';
 export const POSTGRES_DB: string = process.env.POSTGRES_DB || 'postgres';
 export const DB_LOGGING: boolean = process.env.DB_LOGGING === 'true' || false;
+
+// * AUTH
+export const ACCESS_TOKEN_SECRET: string =
+  process.env.ACCESS_TOKEN_SECRET || 'xw5DjZgX3TkTT';
+export const ACCESS_TOKEN_EXPIRES_IN: string =
+  process.env.ACCESS_TOKEN_EXPIRES_IN || '604800'; // 7 days
+export const JWT_RESET_PASSWORD_KEY: string =
+  process.env.JWT_RESET_PASSWORD_KEY || 's21DjZg12Jde';

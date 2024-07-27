@@ -3,6 +3,7 @@ import { AuthModule } from '@modules';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { UserModule } from './modules/user/user.module';
 
 const modules = [AuthModule];
 
@@ -25,6 +26,7 @@ const modules = [AuthModule];
       },
     }),
     ...modules,
+    UserModule,
   ],
   controllers: [],
   providers: [],

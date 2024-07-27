@@ -1,7 +1,12 @@
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  ACCESS_TOKEN_SECRET,
+  JWT_RESET_PASSWORD_KEY,
+} from '@environments';
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('auth', () => ({
-  jwtSecret: process.env.ACCESS_TOKEN_SECRET || 'xw5DjZgX3TkTT',
-  accessTokenExpiration: process.env.ACCESS_TOKEN_EXPIRES_IN || '7d', // 7 days
-  resetPasswordKey: process.env.JWT_RESET_PASSWORD_KEY || 's21DjZg12Jde',
+  jwtSecret: ACCESS_TOKEN_SECRET || 'xw5DjZgX3TkTT',
+  accessTokenExpiration: ACCESS_TOKEN_EXPIRES_IN || '604800', // 7 days
+  resetPasswordKey: JWT_RESET_PASSWORD_KEY || 's21DjZg12Jde',
 }));
