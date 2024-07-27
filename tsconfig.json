@@ -26,7 +26,8 @@
       "@enums": ["src/common/enums"],
       "@exceptions": ["src/common/infra-exception"],
       "@interfaces": ["src/common/interfaces"],
-      "@decorators": ["src/common/decorators"]
+      "@decorators": ["src/common/decorators"],
+      "@dtos": ["src/common/dtos"]
     }
   }
 }
