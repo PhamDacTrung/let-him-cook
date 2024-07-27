@@ -1,7 +1,11 @@
 import { User } from '@entities';
 import { UserRole } from '@enums';
 import { AuthPayload, IAccessToken } from '@interfaces';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +24,15 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
+
+  async validateUserById(userId: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+
+    return user;
+  }
 
   async register(input: RegisterInputDto): Promise<RegisterResponseDto> {
     try {
