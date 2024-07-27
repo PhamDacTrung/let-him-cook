@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { IngredientInputDto } from './dtos';
+import { IngredientInputDto, UpdateIngredientInputDto } from './dtos';
 import { IngredientResponseDto } from './dtos/ingredient.response.dto';
 
 @Injectable()
@@ -21,6 +21,7 @@ export class IngredientService {
   async createIngredient(
     input: IngredientInputDto,
   ): Promise<IngredientResponseDto> {
+    console.log('input :>> ', input);
     try {
       const ingredient = this.ingredientRepository.create(input);
       const newIngredient = await this.ingredientRepository.save(ingredient);
@@ -29,13 +30,16 @@ export class IngredientService {
       }
       return plainToInstance(IngredientResponseDto, newIngredient);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
 
   async updateIngredient(
     ingredientId: string,
-    input: IngredientInputDto,
+    input: UpdateIngredientInputDto,
   ): Promise<UpdateResponseDto> {
     try {
       const ingredient = await this.ingredientRepository.findOneBy({
@@ -60,6 +64,9 @@ export class IngredientService {
         isUpdated: true,
       };
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -84,6 +91,9 @@ export class IngredientService {
         isDeleted: true,
       };
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -93,6 +103,9 @@ export class IngredientService {
       const ingredients = await this.ingredientRepository.find();
       return plainToInstance(IngredientResponseDto, ingredients);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error.message);
     }
   }
@@ -109,6 +122,9 @@ export class IngredientService {
       }
       return plainToInstance(IngredientResponseDto, ingredient);
     } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
       throw new InternalServerErrorException(error.message);
     }
   }

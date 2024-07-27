@@ -10,5 +10,5 @@ export class IngredientResponseDto {
   name: string;
 
   @Expose()
-  typeOfFood: TypeOfFood;
+  type: TypeOfFood;
 }

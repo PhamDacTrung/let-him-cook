@@ -11,5 +11,5 @@ export class IngredientInputDto {
   @IsEnum(TypeOfFood)
   @IsNotEmpty()
   @ApiProperty({ example: TypeOfFood.MEAT })
-  typeOfFood: TypeOfFood;
+  type: TypeOfFood;
 }

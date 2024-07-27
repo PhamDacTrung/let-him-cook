@@ -4,6 +4,7 @@ import { AuthPayload, IAccessToken } from '@interfaces';
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -65,32 +66,42 @@ export class AuthService {
       }
       return plainToInstance(RegisterResponseDto, newUser);
     } catch (error) {
-      throw new BadRequestException(error.message);
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error.message);
     }
   }
 
   async login(input: LoginInputDto): Promise<AuthTokenDto> {
-    const user = await this.userRepository.findOneBy({ email: input.email });
-    if (!user) {
-      throw new BadRequestException('User not found');
+    try {
+      const user = await this.userRepository.findOneBy({ email: input.email });
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
+
+      const isMatch = await bcrypt.compare(input.password, user.password);
+      if (!isMatch) {
+        throw new BadRequestException('Wrong password');
+      }
+
+      // payload
+      const payload = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+
+      const accessToken = this.generateAccessToken(payload).accessToken;
+
+      return plainToInstance(AuthTokenDto, { accessToken });
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error.message);
     }
-
-    const isMatch = await bcrypt.compare(input.password, user.password);
-    if (!isMatch) {
-      throw new BadRequestException('Wrong password');
-    }
-
-    // payload
-    const payload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-    };
-
-    const accessToken = this.generateAccessToken(payload).accessToken;
-
-    return plainToInstance(AuthTokenDto, { accessToken });
   }
 
   generateAccessToken(payload: AuthPayload): IAccessToken {
