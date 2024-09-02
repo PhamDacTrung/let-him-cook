@@ -22,5 +22,5 @@ export class DishIngredient extends BaseEntity {
   quantity: number;
 
   @Column({ type: 'enum', enum: UnitOfMeasurement, nullable: false })
-  unit: string;
+  unit: UnitOfMeasurement;
 }

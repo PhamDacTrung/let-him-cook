@@ -3,10 +3,18 @@ import { AuthModule } from '@modules';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { DishModule } from './modules/dish/dish.module';
 import { IngredientModule } from './modules/ingredient/ingredient.module';
 import { UserModule } from './modules/user/user.module';
+import { VoteModule } from './modules/vote/vote.module';
 
-const modules = [AuthModule, UserModule, IngredientModule];
+const modules = [
+  AuthModule,
+  UserModule,
+  IngredientModule,
+  DishModule,
+  VoteModule,
+];
 
 @Module({
   imports: [
