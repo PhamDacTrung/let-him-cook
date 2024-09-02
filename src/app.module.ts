@@ -6,8 +6,15 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { DishModule } from './modules/dish/dish.module';
 import { IngredientModule } from './modules/ingredient/ingredient.module';
 import { UserModule } from './modules/user/user.module';
+import { VoteModule } from './modules/vote/vote.module';
 
-const modules = [AuthModule, UserModule, IngredientModule, DishModule];
+const modules = [
+  AuthModule,
+  UserModule,
+  IngredientModule,
+  DishModule,
+  VoteModule,
+];
 
 @Module({
   imports: [
