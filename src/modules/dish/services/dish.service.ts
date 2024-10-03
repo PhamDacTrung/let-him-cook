@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { DishInputDto, UpdateDishInputDto } from './dtos';
+import { DishInputDto, UpdateDishInputDto } from '../dtos';
 
 @Injectable()
 export class DishService {

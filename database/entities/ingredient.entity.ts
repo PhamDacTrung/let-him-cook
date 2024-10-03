@@ -1,5 +1,5 @@
 import { TypeOfFood } from '@enums';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, Index } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
 @Entity()
@@ -9,4 +9,14 @@ export class Ingredient extends BaseEntity {
 
   @Column({ type: 'enum', enum: TypeOfFood })
   type: TypeOfFood;
+
+  @Column({
+    type: 'tsvector',
+    generatedType: 'STORED',
+    asExpression: "to_tsvector('simple', name)",
+    select: false,
+    nullable: true,
+  })
+  @Index('ingredient_search_vector_idx', { synchronize: false })
+  search_vector: string;
 }

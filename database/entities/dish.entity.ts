@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base.entity';
 import { User } from './user.entity';
 
@@ -22,4 +22,14 @@ export class Dish extends BaseEntity {
 
   @Column({ type: 'boolean', default: true })
   isVerified: boolean;
+
+  @Column({
+    type: 'tsvector',
+    generatedType: 'STORED',
+    asExpression: "to_tsvector('simple', name)",
+    select: false,
+    nullable: true,
+  })
+  @Index('dish_search_vector_idx', { synchronize: false })
+  search_vector: string;
 }

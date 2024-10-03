@@ -1,10 +1,12 @@
 import { CurrentUser } from '@decorators';
 import { User } from '@entities';
+import { INJECTION_SERVICE_TOKEN } from '@enums';
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -13,13 +15,16 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards';
 import { UpdateVoteInputDto } from './dtos';
-import { VoteService } from './vote.service';
+import { IVoteService } from './interfaces';
 
 @ApiTags('Vote')
 @Controller('vote')
 @UseGuards(JwtAuthGuard)
 export class VoteController {
-  constructor(private readonly voteService: VoteService) {}
+  constructor(
+    @Inject(INJECTION_SERVICE_TOKEN.VOTE_SERVICE)
+    private readonly voteService: IVoteService,
+  ) {}
 
   @Get(':dishId')
   async getVotesByDishId(@Param('dishId') dishId: string) {

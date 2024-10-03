@@ -8,11 +8,15 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { IngredientInputDto, UpdateIngredientInputDto } from './dtos';
-import { IngredientResponseDto } from './dtos/ingredient.response.dto';
+import {
+  IngredientInputDto,
+  IngredientResponseDto,
+  UpdateIngredientInputDto,
+} from '../dtos';
+import { IIngredientService } from '../interfaces';
 
 @Injectable()
-export class IngredientService {
+export class IngredientService implements IIngredientService {
   constructor(
     @InjectRepository(Ingredient)
     private readonly ingredientRepository: Repository<Ingredient>,
@@ -21,7 +25,6 @@ export class IngredientService {
   async createIngredient(
     input: IngredientInputDto,
   ): Promise<IngredientResponseDto> {
-    console.log('input :>> ', input);
     try {
       const ingredient = this.ingredientRepository.create(input);
       const newIngredient = await this.ingredientRepository.save(ingredient);

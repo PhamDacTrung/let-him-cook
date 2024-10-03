@@ -1,15 +1,19 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { INJECTION_SERVICE_TOKEN } from '@enums';
+import { Body, Controller, Inject, Post } from '@nestjs/common';
 import {
   AuthTokenDto,
   LoginInputDto,
   RegisterInputDto,
   RegisterResponseDto,
 } from './dtos';
+import { IAuthService } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(INJECTION_SERVICE_TOKEN.AUTH_SERVICE)
+    private readonly authService: IAuthService,
+  ) {}
 
   @Post('register')
   register(@Body() input: RegisterInputDto): Promise<RegisterResponseDto> {

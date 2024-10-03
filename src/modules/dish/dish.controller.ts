@@ -1,10 +1,12 @@
 import { CurrentUser } from '@decorators';
 import { User } from '@entities';
+import { INJECTION_SERVICE_TOKEN } from '@enums';
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -12,15 +14,18 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards';
-import { DishService } from './dish.service';
 import { DishInputDto } from './dtos';
+import { IDishService } from './interfaces';
 
 @ApiTags('Dish')
 @Controller('dish')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('access-token')
 export class DishController {
-  constructor(private readonly dishService: DishService) {}
+  constructor(
+    @Inject(INJECTION_SERVICE_TOKEN.DISH_SERVICE)
+    private readonly dishService: IDishService,
+  ) {}
 
   @Post()
   async createDish(@CurrentUser() user: User, @Body() input: DishInputDto) {
