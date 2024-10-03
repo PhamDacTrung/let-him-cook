@@ -1,21 +1,39 @@
 import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
 import { Vote } from '@entities';
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UpdateVoteInputDto } from './dtos';
+import { UpdateVoteInputDto } from '../dtos';
+import { IVoteService } from '../interfaces';
 
 @Injectable()
-export class VoteService {
+export class VoteService implements IVoteService {
   constructor(
     @InjectRepository(Vote) private readonly voteRepository: Repository<Vote>,
   ) {}
+
+  async getAverageRatingNumberByDishId(dishId: string): Promise<number> {
+    try {
+      return await this.voteRepository
+        .createQueryBuilder('vote')
+        .select('AVG(vote.rating)', 'averageRating')
+        .where('vote.dishId = :dishId', { dishId })
+        .getRawOne();
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
 
   async getVotesByDishId(dishId: string) {
     try {
       return await this.voteRepository.findBy({ dishId });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -23,7 +41,7 @@ export class VoteService {
     try {
       return await this.voteRepository.findBy({ userId, dishId });
     } catch (error) {
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -39,7 +57,7 @@ export class VoteService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -72,7 +90,7 @@ export class VoteService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -97,7 +115,7 @@ export class VoteService {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new BadRequestException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 }

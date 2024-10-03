@@ -1,12 +1,20 @@
 import { Vote } from '@entities';
+import { INJECTION_SERVICE_TOKEN } from '@enums';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { VoteService } from './services/vote.service';
 import { VoteController } from './vote.controller';
-import { VoteService } from './vote.service';
+
+const Adapters = [
+  {
+    provide: INJECTION_SERVICE_TOKEN.VOTE_SERVICE,
+    useClass: VoteService,
+  },
+];
 
 @Module({
   imports: [TypeOrmModule.forFeature([Vote])],
   controllers: [VoteController],
-  providers: [VoteService],
+  providers: [...Adapters],
 })
 export class VoteModule {}

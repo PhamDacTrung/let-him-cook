@@ -1,12 +1,20 @@
 import { AuthConfig } from '@config';
 import { User } from '@entities';
+import { INJECTION_SERVICE_TOKEN } from '@enums';
 import { Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthPasswordService } from './services/auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
+
+const Adapters = [
+  {
+    provide: INJECTION_SERVICE_TOKEN.AUTH_SERVICE,
+    useClass: AuthPasswordService,
+  },
+];
 
 @Module({
   imports: [
@@ -26,6 +34,6 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [JwtStrategy, AuthService],
+  providers: [...Adapters, JwtStrategy],
 })
 export class AuthModule {}

@@ -17,10 +17,11 @@ import {
   LoginInputDto,
   RegisterInputDto,
   RegisterResponseDto,
-} from './dtos';
+} from '../dtos';
+import { IAuthService } from '../interfaces';
 
 @Injectable()
-export class AuthService {
+export class AuthPasswordService implements IAuthService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
@@ -104,7 +105,7 @@ export class AuthService {
     }
   }
 
-  generateAccessToken(payload: AuthPayload): IAccessToken {
+  private generateAccessToken(payload: AuthPayload): IAccessToken {
     return {
       accessToken: this.jwtService.sign(payload),
     };

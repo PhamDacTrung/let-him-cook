@@ -1,11 +1,12 @@
 import { Roles } from '@decorators';
 import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
-import { UserRole } from '@enums';
+import { INJECTION_SERVICE_TOKEN, UserRole } from '@enums';
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -15,14 +16,17 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
 import { IngredientInputDto, UpdateIngredientInputDto } from './dtos';
 import { IngredientResponseDto } from './dtos/ingredient.response.dto';
-import { IngredientService } from './ingredient.service';
+import { IIngredientService } from './interfaces';
 
 @ApiTags('Ingredient')
 @Controller('ingredients')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth('access-token')
 export class IngredientController {
-  constructor(private readonly ingredientService: IngredientService) {}
+  constructor(
+    @Inject(INJECTION_SERVICE_TOKEN.INGREDIENT_SERVICE)
+    private readonly ingredientService: IIngredientService,
+  ) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
