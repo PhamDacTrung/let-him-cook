@@ -14,8 +14,11 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard, RolesGuard } from '../auth/guards';
-import { IngredientInputDto, UpdateIngredientInputDto } from './dtos';
-import { IngredientResponseDto } from './dtos/ingredient.response.dto';
+import {
+  IngredientInputDto,
+  IngredientResponseDto,
+  UpdateIngredientInputDto,
+} from './dtos';
 import { IIngredientService } from './interfaces';
 
 @ApiTags('Ingredient')

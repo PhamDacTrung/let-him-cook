@@ -1,4 +1,4 @@
-import { Dish, DishIngredient } from '@entities';
+import { Dish, DishIngredient, DishTaste, DishTemperature } from '@entities';
 import { INJECTION_SERVICE_TOKEN } from '@enums';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,7 +13,14 @@ const Adapters = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Dish, DishIngredient])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Dish,
+      DishIngredient,
+      DishTaste,
+      DishTemperature,
+    ]),
+  ],
   controllers: [DishController],
   providers: [...Adapters],
 })

@@ -1,3 +1,4 @@
+import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
 import { Dish, DishIngredient } from '@entities';
 import {
   BadRequestException,
@@ -5,24 +6,45 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PageDto, PageMetaDto, PageOptionsDto } from '@pagination';
+import { plainToInstance } from 'class-transformer';
+import { DishTaste } from 'database/entities/dish-taste.entity';
+import { DishTemperature } from 'database/entities/dish-temperature.entity';
 import { DataSource, Repository } from 'typeorm';
-import { DishInputDto, UpdateDishInputDto } from '../dtos';
+import {
+  DishInputDto,
+  DishResponseDto,
+  FilterDishesDto,
+  UpdateDishInputDto,
+} from '../dtos';
+import { IDishService } from '../interfaces';
 
 @Injectable()
-export class DishService {
+export class DishService implements IDishService {
   constructor(
     @InjectRepository(Dish) private readonly dishRepository: Repository<Dish>,
+
     @InjectRepository(DishIngredient)
     private readonly dishIngredientRepository: Repository<DishIngredient>,
+
+    @InjectRepository(DishTaste)
+    private readonly dishTasteRepository: Repository<DishTaste>,
+
+    @InjectRepository(DishTemperature)
+    private readonly dishTemperatureRepository: Repository<DishTemperature>,
+
     private readonly dataSource: DataSource,
   ) {}
 
-  async createDish(userId: string, input: DishInputDto) {
+  async createDish(
+    userId: string,
+    input: DishInputDto,
+  ): Promise<DishResponseDto> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const createDish = await queryRunner.manager.create(Dish, {
+      const createDish = queryRunner.manager.create(Dish, {
         ...input,
         authorId: userId,
       });
@@ -34,7 +56,7 @@ export class DishService {
 
       // create Dish Ingredient for each ingredient in input
       for (const ingredient of input.ingredients) {
-        const createDishIngredient = await queryRunner.manager.create(
+        const createDishIngredient = queryRunner.manager.create(
           DishIngredient,
           {
             ...ingredient,
@@ -49,8 +71,39 @@ export class DishService {
           throw new BadRequestException('Failed to create dish ingredient');
         }
       }
+
+      if (input.tastes.length > 0) {
+        // create Dish Taste for each taste in input
+        await Promise.all(
+          input.tastes.map(async (taste) => {
+            const createDishTaste = queryRunner.manager.create(DishTaste, {
+              dishId: saveDish.id,
+              taste,
+            });
+            const saveDishTaste = await queryRunner.manager.save(
+              DishTaste,
+              createDishTaste,
+            );
+            if (!saveDishTaste) {
+              throw new BadRequestException('Failed to create dish taste');
+            }
+          }),
+        );
+      }
+
+      if (input.temperature) {
+        const createDishTemperature = queryRunner.manager.create(
+          DishTemperature,
+          {
+            dishId: saveDish.id,
+            temperature: input.temperature,
+          },
+        );
+        await queryRunner.manager.save(DishTemperature, createDishTemperature);
+      }
+
       await queryRunner.commitTransaction();
-      return saveDish;
+      return plainToInstance(DishResponseDto, saveDish);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {
@@ -62,7 +115,7 @@ export class DishService {
     }
   }
 
-  async getDish(dishId: string) {
+  async getDish(dishId: string): Promise<DishResponseDto> {
     const dish = await this.dishRepository
       .createQueryBuilder('dish')
       .where('dish.id = :dishId', { dishId })
@@ -72,11 +125,119 @@ export class DishService {
         'dishIngredient',
         'dishIngredient.dishId = dish.id',
       )
+      .leftJoinAndMapMany(
+        'dish.tastes',
+        DishTaste,
+        'dishTaste',
+        'dishTaste.dishId = dish.id',
+      )
+      .leftJoinAndMapOne(
+        'dish.temperature',
+        DishTemperature,
+        'dishTemperature',
+        'dishTemperature.dishId = dish.id',
+      )
       .getOne();
-    return dish;
+    return plainToInstance(DishResponseDto, dish);
   }
 
-  async updateDish(dishId: string, input: UpdateDishInputDto) {
+  async getDishes(
+    pageOptions: PageOptionsDto,
+    filter: FilterDishesDto,
+  ): Promise<PageDto<DishResponseDto>> {
+    try {
+      const { page, take, sort, sortDirection } = pageOptions;
+
+      const dishesQuery = this.dishRepository
+        .createQueryBuilder('dish')
+        .leftJoinAndMapMany(
+          'dish.ingredients',
+          DishIngredient,
+          'dishIngredient',
+          'dishIngredient.dishId = dish.id',
+        )
+        .leftJoinAndMapMany(
+          'dish.tastes',
+          DishTaste,
+          'dishTaste',
+          'dishTaste.dishId = dish.id',
+        )
+        .leftJoinAndMapOne(
+          'dish.temperature',
+          DishTemperature,
+          'dishTemperature',
+          'dishTemperature.dishId = dish.id',
+        )
+        .take(take)
+        .skip(pageOptions.skip);
+
+      if (sort || sortDirection) {
+        dishesQuery.orderBy(
+          `dish.${sort || 'createdAt'}`,
+          sortDirection || 'DESC',
+        );
+      }
+
+      if (filter) {
+        const { keyword, tastes, temperature } = filter;
+        if (keyword) {
+          const formattedQuery = keyword.trim().replace(/ /g, ' & ');
+          const query = keyword ? `${formattedQuery}:*` : formattedQuery;
+          dishesQuery.andWhere(
+            "dish.search_vector @@ to_tsquery('simple',:query)",
+            {
+              query,
+            },
+          );
+        }
+
+        if (tastes?.length > 0) {
+          // dishesQuery.andWhere('dishTaste.taste IN (:...tastes)', {
+          //   tastes,
+          // });
+
+          dishesQuery.andWhere((qb) => {
+            const subQuery = qb
+              .subQuery()
+              .select('dish_id')
+              .from(DishTaste, 'dishTaste')
+              .where('dishTaste.taste IN (:...tastes)', {
+                tastes,
+              })
+              .groupBy('dish_id');
+            return 'dish.id IN (' + subQuery.getQuery() + ')';
+          });
+        }
+
+        if (temperature) {
+          dishesQuery.andWhere('dishTemperature.temperature = :temperature', {
+            temperature,
+          });
+        }
+      }
+
+      const [dishes, total] = await dishesQuery.getManyAndCount();
+
+      const data = dishes.map((dish) => {
+        return plainToInstance(DishResponseDto, dish);
+      });
+
+      const pageMeta = new PageMetaDto({
+        take: take,
+        page: page,
+        itemCount: total,
+      });
+
+      return new PageDto(data, pageMeta);
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  async updateDish(
+    dishId: string,
+    input: UpdateDishInputDto,
+  ): Promise<UpdateResponseDto> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect(); // connect to database
     await queryRunner.startTransaction(); // start transaction
@@ -121,7 +282,9 @@ export class DishService {
       }
 
       await queryRunner.commitTransaction();
-      return updateDish;
+      return {
+        isUpdated: true,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {
@@ -133,7 +296,7 @@ export class DishService {
     }
   }
 
-  async deleteDish(dishId: string) {
+  async deleteDish(dishId: string): Promise<DeleteResponseDto> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect(); // connect to database
     await queryRunner.startTransaction(); // start transaction
@@ -162,7 +325,9 @@ export class DishService {
       }
 
       await queryRunner.commitTransaction();
-      return deleteDish;
+      return {
+        isDeleted: true,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {

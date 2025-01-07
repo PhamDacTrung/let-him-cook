@@ -35,5 +35,6 @@ const Adapters = [
   ],
   controllers: [AuthController],
   providers: [...Adapters, JwtStrategy],
+  exports: [],
 })
 export class AuthModule {}

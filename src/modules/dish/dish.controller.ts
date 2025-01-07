@@ -10,15 +10,17 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { PageOptionsDto } from '@pagination';
 import { JwtAuthGuard } from '../auth/guards';
-import { DishInputDto } from './dtos';
+import { DishInputDto, FilterDishesDto } from './dtos';
 import { IDishService } from './interfaces';
 
 @ApiTags('Dish')
-@Controller('dish')
+@Controller('dishes')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('access-token')
 export class DishController {
@@ -30,6 +32,14 @@ export class DishController {
   @Post()
   async createDish(@CurrentUser() user: User, @Body() input: DishInputDto) {
     return await this.dishService.createDish(user.id, input);
+  }
+
+  @Get()
+  async getDishes(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Query() filters: FilterDishesDto,
+  ) {
+    return await this.dishService.getDishes(pageOptionsDto, filters);
   }
 
   @Get(':dishId')
