@@ -1,8 +1,8 @@
-import { UserRole } from '@enums';
+import { EnumUserRole } from '@common/enums';
 
 export interface AuthPayload {
   id: string;
   name: string;
   email: string;
-  role: UserRole;
+  role: EnumUserRole;
 }

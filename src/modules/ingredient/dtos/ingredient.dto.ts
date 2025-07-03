@@ -1,4 +1,4 @@
-import { TypeOfFood } from '@enums';
+import { EnumTypeOfFood } from '@common/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude, Expose } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
@@ -11,10 +11,10 @@ export class IngredientBaseDto {
   name: string;
 
   @Expose()
-  @IsEnum(TypeOfFood)
+  @IsEnum(EnumTypeOfFood)
   @IsNotEmpty()
-  @ApiProperty({ example: TypeOfFood.MEAT })
-  type: TypeOfFood;
+  @ApiProperty({ example: EnumTypeOfFood.MEAT })
+  type: EnumTypeOfFood;
 }
 
 export class IngredientInputDto extends IngredientBaseDto {}

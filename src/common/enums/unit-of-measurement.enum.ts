@@ -1,4 +1,4 @@
-export enum UnitOfMeasurement {
+export enum EnumUnitOfMeasurement {
   GRAM = 'GRAM',
   KILOGRAM = 'KILOGRAM',
   LITRE = 'LITRE',

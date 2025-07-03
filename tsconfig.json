@@ -18,17 +18,18 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@environments": ["environment"],
-      "@entities": ["database/entities"],
+      "@environments": ["environments"],
+      "@entities": ["src/infrastructure/database/typeorm/entities"],
       "@modules": ["src/modules"],
+      "@modules/*": ["src/modules/*"],
       "@config": ["src/config"],
-      "@common": ["src/common"],
-      "@enums": ["src/common/enums"],
-      "@exceptions": ["src/common/infra-exception"],
-      "@interfaces": ["src/common/interfaces"],
-      "@decorators": ["src/common/decorators"],
-      "@dtos": ["src/common/dtos"],
-      "@pagination": ["src/common/pagination"]
+      "@common/*": ["src/common/*"],
+      "@core/*": ["src/core/*"],
+      "@utilities": ["src/utilities"],
+      "@router/*": ["src/router/*"],
+      "@infrastructure": ["src/infrastructure"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@auth/guards": ["src/modules/auth/guards"]
     }
   }
 }

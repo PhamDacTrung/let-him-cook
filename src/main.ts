@@ -1,25 +1,37 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 
-import { PORT } from '@environments';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CoreTransformInterceptor } from '@core/interceptors';
+import {
+  ClassSerializerInterceptor,
+  ValidationPipe,
+  VersioningType,
+} from '@nestjs/common';
+import { setupSwagger } from '@utilities';
+import { PORT } from 'environments';
+import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
+import { initializeTransactionalContext } from 'typeorm-transactional';
+import { Logger } from 'winston';
 import { AppModule } from './app.module';
-import { CoreTransformInterceptor } from './common/interceptors';
 
 async function bootstrap() {
+  initializeTransactionalContext();
+
   const app = await NestFactory.create(AppModule);
 
-  const swaggerOption = new DocumentBuilder()
-    .setTitle('Talent Scout API')
-    .setDescription('Talent Scout API description')
-    .setVersion('1.0')
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'access-token',
-    )
-    .build();
-  const document = SwaggerModule.createDocument(app, swaggerOption);
-  SwaggerModule.setup('api', app, document);
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: '1',
+  });
+
+  // Setup Swagger documentation
+  setupSwagger(app);
+
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: '*',
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -29,11 +41,24 @@ async function bootstrap() {
     }),
   );
 
+  // First, apply our custom interceptor which formats the response
+  // Then apply the ClassSerializerInterceptor for the other responses
   app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector), {}),
     new CoreTransformInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      excludeExtraneousValues: true,
+      exposeUnsetFields: true,
+      strategy: 'excludeAll',
+      enableImplicitConversion: false,
+      exposeDefaultValues: false,
+      enableCircularCheck: true,
+    }),
   );
 
   await app.listen(PORT);
+
+  // Get the Winston logger instance
+  const logger = app.get(WINSTON_MODULE_PROVIDER) as Logger;
+  logger.info(`🚀 Server is running on port ${PORT}`);
 }
 bootstrap();

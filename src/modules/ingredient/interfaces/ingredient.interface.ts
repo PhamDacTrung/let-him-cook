@@ -1,4 +1,4 @@
-import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
+import { DeleteResponseDto, UpdateResponseDto } from '@common/dtos';
 import {
   IngredientInputDto,
   IngredientResponseDto,

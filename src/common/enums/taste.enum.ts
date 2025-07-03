@@ -1,4 +1,4 @@
-export enum Taste {
+export enum EnumTaste {
   SPICY = 'SPICY',
   SOUR = 'SOUR',
   BITTER = 'BITTER',

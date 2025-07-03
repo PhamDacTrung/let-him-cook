@@ -1,4 +1,6 @@
-import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
+import { DeleteResponseDto, UpdateResponseDto } from '@common/dtos';
+import { EnumSortDirection } from '@common/enums';
+import { PageDto, PageMetaDto, PageOptionsDto } from '@common/pagination';
 import { Vote } from '@entities';
 import {
   BadRequestException,
@@ -7,8 +9,10 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { UpdateVoteInputDto } from '../dtos';
+import { UpdateVoteInputDto } from '../dtos/requests';
+import { VoteResponseDto } from '../dtos/responses';
 import { IVoteService } from '../interfaces';
 
 @Injectable()
@@ -29,9 +33,32 @@ export class VoteService implements IVoteService {
     }
   }
 
-  async getVotesByDishId(dishId: string) {
+  async getVotesByDishId(
+    dishId: string,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<VoteResponseDto>> {
     try {
-      return await this.voteRepository.findBy({ dishId });
+      const { page, take, sort, sortDirection } = pageOptionsDto;
+
+      const [votes, total] = await this.voteRepository.findAndCount({
+        where: { dishId },
+        skip: page === 1 ? 0 : (page - 1) * take,
+        take,
+        order: {
+          [sort || 'createdAt']: sortDirection || EnumSortDirection.DESC,
+        },
+      });
+
+      const meta = new PageMetaDto({
+        page,
+        take,
+        itemCount: total,
+      });
+
+      return plainToInstance(PageDto<VoteResponseDto>, {
+        data: plainToInstance(VoteResponseDto, votes),
+        meta,
+      });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
     }
@@ -83,9 +110,10 @@ export class VoteService implements IVoteService {
         throw new BadRequestException('Failed to update vote');
       }
 
-      return {
-        isUpdated: true,
-      };
+      return plainToInstance(UpdateResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;
@@ -110,7 +138,10 @@ export class VoteService implements IVoteService {
       if (!deleteVote) {
         throw new BadRequestException('Failed to delete vote');
       }
-      return { isDeleted: true };
+      return plainToInstance(DeleteResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

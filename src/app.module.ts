@@ -1,20 +1,17 @@
-import { configurations, DatabaseConfig } from '@config';
-import { AuthModule } from '@modules';
+import { configurations, LogConfig } from '@config';
+import { HttpExceptionFilter } from '@core/exceptions';
+import { Infrastructure } from '@infrastructure';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigType } from '@nestjs/config';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { DishModule } from './modules/dish/dish.module';
-import { IngredientModule } from './modules/ingredient/ingredient.module';
+import { APP_FILTER } from '@nestjs/core';
+import { RouterModule } from '@router/router.module';
+import {
+  WINSTON_MODULE_PROVIDER,
+  WinstonModule,
+  WinstonModuleOptions,
+} from 'nest-winston';
+import { Logger } from 'winston';
 import { UserModule } from './modules/user/user.module';
-import { VoteModule } from './modules/vote/vote.module';
-
-const modules = [
-  AuthModule,
-  UserModule,
-  IngredientModule,
-  DishModule,
-  VoteModule,
-];
 
 @Module({
   imports: [
@@ -25,18 +22,23 @@ const modules = [
       cache: true,
     }),
 
-    TypeOrmModule.forRootAsync({
-      inject: [DatabaseConfig.KEY],
-      useFactory: (config: ConfigType<typeof DatabaseConfig>) => {
-        if (!config) {
-          throw new Error('Cannot start app without ORM config');
-        }
-        return config as TypeOrmModuleOptions;
+    WinstonModule.forRootAsync({
+      inject: [LogConfig.KEY],
+      useFactory: (config: ConfigType<typeof LogConfig>) => {
+        return config as WinstonModuleOptions;
       },
     }),
-    ...modules,
+
+    RouterModule.forRoot(),
+    ...Infrastructure,
+    UserModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useFactory: (logger: Logger) => new HttpExceptionFilter(logger),
+      inject: [WINSTON_MODULE_PROVIDER],
+    },
+  ],
 })
 export class AppModule {}

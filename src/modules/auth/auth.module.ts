@@ -1,17 +1,18 @@
 import { AuthConfig } from '@config';
 import { User } from '@entities';
-import { INJECTION_SERVICE_TOKEN } from '@enums';
+
+import { EnumInjectServiceToken } from '@common/enums';
 import { Module } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './auth.controller';
 import { AuthPasswordService } from './services/auth.service';
+import { RbacService } from './services/rbac.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 const Adapters = [
   {
-    provide: INJECTION_SERVICE_TOKEN.AUTH_SERVICE,
+    provide: EnumInjectServiceToken.AUTH_SERVICE,
     useClass: AuthPasswordService,
   },
 ];
@@ -33,8 +34,7 @@ const Adapters = [
       },
     }),
   ],
-  controllers: [AuthController],
-  providers: [...Adapters, JwtStrategy],
-  exports: [],
+  providers: [...Adapters, JwtStrategy, RbacService],
+  exports: [...Adapters, RbacService],
 })
 export class AuthModule {}

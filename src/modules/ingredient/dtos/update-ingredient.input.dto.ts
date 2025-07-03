@@ -1,4 +1,4 @@
-import { TypeOfFood } from '@enums';
+import { EnumTypeOfFood } from '@common/enums';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
@@ -8,8 +8,8 @@ export class UpdateIngredientInputDto {
   @ApiPropertyOptional({ example: 'Becon' })
   name?: string;
 
-  @IsEnum(TypeOfFood)
+  @IsEnum(EnumTypeOfFood)
   @IsOptional()
-  @ApiPropertyOptional({ example: TypeOfFood.MEAT })
-  type?: TypeOfFood;
+  @ApiPropertyOptional({ example: EnumTypeOfFood.MEAT })
+  type?: EnumTypeOfFood;
 }

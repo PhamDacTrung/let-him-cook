@@ -1,6 +1,6 @@
+import { EnumInjectServiceToken } from '@common/enums';
+import { AuthPayload } from '@common/interfaces';
 import { User } from '@entities';
-import { INJECTION_SERVICE_TOKEN } from '@enums';
-import { AuthPayload } from '@interfaces';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     @Inject(AuthConfig.KEY)
     private readonly authConfig: ConfigType<typeof AuthConfig>,
 
-    @Inject(INJECTION_SERVICE_TOKEN.AUTH_SERVICE)
+    @Inject(EnumInjectServiceToken.AUTH_SERVICE)
     private readonly authService: IAuthService,
   ) {
     super({

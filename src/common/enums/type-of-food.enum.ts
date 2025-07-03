@@ -1,4 +1,4 @@
-export enum TypeOfFood {
+export enum EnumTypeOfFood {
   VEGETABLE = 'VEGETABLE',
   FRUIT = 'FRUIT',
   MEAT = 'MEAT',

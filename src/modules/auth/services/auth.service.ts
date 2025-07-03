@@ -1,6 +1,6 @@
+import { EnumUserRole } from '@common/enums';
+import { AuthPayload, IAccessToken } from '@common/interfaces';
 import { User } from '@entities';
-import { UserRole } from '@enums';
-import { AuthPayload, IAccessToken } from '@interfaces';
 import {
   BadRequestException,
   Injectable,
@@ -57,7 +57,7 @@ export class AuthPasswordService implements IAuthService {
 
       const createUser = this.userRepository.create({
         ...input,
-        role: UserRole.USER,
+        role: EnumUserRole.USER,
         password: hashPassword,
       });
 

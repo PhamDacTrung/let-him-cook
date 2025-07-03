@@ -1,4 +1,6 @@
+export * from './config.enum';
 export * from './inject-service-token.enum';
+export * from './rbac.enum';
 export * from './sort-direction.enum';
 export * from './taste.enum';
 export * from './temperature.enum';

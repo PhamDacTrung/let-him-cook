@@ -1,4 +1,4 @@
-import { UnitOfMeasurement } from '@enums';
+import { EnumUnitOfMeasurement } from '@common/enums';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
 
@@ -13,8 +13,8 @@ export class DishIngredientInputDto {
   @ApiProperty({ example: 2 })
   quantity: number;
 
-  @IsEnum(UnitOfMeasurement)
+  @IsEnum(EnumUnitOfMeasurement)
   @IsNotEmpty()
-  @ApiProperty({ example: UnitOfMeasurement.GRAM })
-  unit: UnitOfMeasurement;
+  @ApiProperty({ example: EnumUnitOfMeasurement.GRAM })
+  unit: EnumUnitOfMeasurement;
 }

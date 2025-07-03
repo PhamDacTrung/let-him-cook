@@ -1,13 +1,12 @@
+import { EnumInjectServiceToken } from '@common/enums';
 import { Dish, DishIngredient, DishTaste, DishTemperature } from '@entities';
-import { INJECTION_SERVICE_TOKEN } from '@enums';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DishController } from './dish.controller';
 import { DishService } from './services';
 
 const Adapters = [
   {
-    provide: INJECTION_SERVICE_TOKEN.DISH_SERVICE,
+    provide: EnumInjectServiceToken.DISH_SERVICE,
     useClass: DishService,
   },
 ];
@@ -21,7 +20,7 @@ const Adapters = [
       DishTemperature,
     ]),
   ],
-  controllers: [DishController],
   providers: [...Adapters],
+  exports: [...Adapters],
 })
 export class DishModule {}

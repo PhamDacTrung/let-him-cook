@@ -1,4 +1,4 @@
-import { Taste, Temperature } from '@enums';
+import { EnumTaste, EnumTemperature } from '@common/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Exclude, Expose, Type } from 'class-transformer';
 import {
@@ -48,15 +48,15 @@ export class DishBaseDto {
   @Expose()
   @IsOptional()
   @IsArray()
-  @IsEnum(Taste, { each: true })
-  @ApiPropertyOptional({ example: [Taste.SPICY, Taste.SWEET] })
-  tastes: Taste[];
+  @IsEnum(EnumTaste, { each: true })
+  @ApiPropertyOptional({ example: [EnumTaste.SPICY, EnumTaste.SWEET] })
+  tastes: EnumTaste[];
 
   @Expose()
   @IsOptional()
-  @IsEnum(Temperature)
-  @ApiPropertyOptional({ example: Temperature.HOT })
-  temperature: Temperature;
+  @IsEnum(EnumTemperature)
+  @ApiPropertyOptional({ example: EnumTemperature.HOT })
+  temperature: EnumTemperature;
 }
 
 export class DishInputDto extends DishBaseDto {}

@@ -1,5 +1,5 @@
-import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
-import { PageDto, PageOptionsDto } from '@pagination';
+import { DeleteResponseDto, UpdateResponseDto } from '@common/dtos';
+import { PageDto, PageOptionsDto } from '@common/pagination';
 import {
   DishInputDto,
   DishResponseDto,

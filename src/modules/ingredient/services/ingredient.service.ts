@@ -1,4 +1,4 @@
-import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
+import { DeleteResponseDto, UpdateResponseDto } from '@common/dtos';
 import { Ingredient } from '@entities';
 import {
   BadRequestException,
@@ -63,9 +63,10 @@ export class IngredientService implements IIngredientService {
         throw new BadRequestException('Cannot update ingredient');
       }
 
-      return {
-        isUpdated: true,
-      };
+      return plainToInstance(UpdateResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -90,9 +91,10 @@ export class IngredientService implements IIngredientService {
         throw new BadRequestException('Cannot delete ingredient');
       }
 
-      return {
-        isDeleted: true,
-      };
+      return plainToInstance(DeleteResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;

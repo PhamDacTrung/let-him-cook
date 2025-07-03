@@ -1,3 +1,7 @@
+import { EnumConfigKey } from '@common/enums';
+import { NamingStrategy } from '@infrastructure/database/typeorm/config';
+import { registerAs } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import {
   DB_LOGGING,
   POSTGRES_DB,
@@ -5,13 +9,10 @@ import {
   POSTGRES_PASSWORD,
   POSTGRES_PORT,
   POSTGRES_USER,
-} from '@environments';
-import { registerAs } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { NamingStrategy } from 'database/typeorm';
+} from 'environments';
 import { join } from 'path';
 
-export default registerAs<TypeOrmModuleOptions>('database', () => ({
+export default registerAs<TypeOrmModuleOptions>(EnumConfigKey.DATABASE, () => ({
   type: 'postgres',
   host: POSTGRES_HOST,
   port: POSTGRES_PORT,

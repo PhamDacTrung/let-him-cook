@@ -1,4 +1,4 @@
-import { SortDirection } from '@enums';
+import { EnumSortDirection } from '@common/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
@@ -9,10 +9,10 @@ export class PageOptionsDto {
   @IsString()
   sort?: string | null;
 
-  @ApiPropertyOptional({ enum: SortDirection, nullable: true })
-  @IsEnum(SortDirection)
+  @ApiPropertyOptional({ enum: EnumSortDirection, nullable: true })
+  @IsEnum(EnumSortDirection)
   @IsOptional()
-  sortDirection?: SortDirection | null;
+  sortDirection?: EnumSortDirection | null;
 
   @ApiProperty({ minimum: 1, example: 1 })
   @Type(() => Number)

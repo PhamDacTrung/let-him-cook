@@ -1,15 +1,13 @@
-import { DeleteResponseDto, UpdateResponseDto } from '@dtos';
-import { Dish, DishIngredient } from '@entities';
+import { DeleteResponseDto, UpdateResponseDto } from '@common/dtos';
+import { PageDto, PageMetaDto, PageOptionsDto } from '@common/pagination';
+import { Dish, DishIngredient, DishTaste, DishTemperature } from '@entities';
 import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PageDto, PageMetaDto, PageOptionsDto } from '@pagination';
 import { plainToInstance } from 'class-transformer';
-import { DishTaste } from 'database/entities/dish-taste.entity';
-import { DishTemperature } from 'database/entities/dish-temperature.entity';
 import { DataSource, Repository } from 'typeorm';
 import {
   DishInputDto,
@@ -282,9 +280,10 @@ export class DishService implements IDishService {
       }
 
       await queryRunner.commitTransaction();
-      return {
-        isUpdated: true,
-      };
+      return plainToInstance(UpdateResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {
@@ -325,9 +324,10 @@ export class DishService implements IDishService {
       }
 
       await queryRunner.commitTransaction();
-      return {
-        isDeleted: true,
-      };
+      return plainToInstance(DeleteResponseDto, {
+        isSuccess: true,
+        at: new Date(),
+      });
     } catch (error) {
       await queryRunner.rollbackTransaction();
       if (error instanceof BadRequestException) {
